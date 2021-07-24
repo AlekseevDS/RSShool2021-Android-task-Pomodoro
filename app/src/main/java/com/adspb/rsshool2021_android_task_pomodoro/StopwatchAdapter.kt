@@ -43,7 +43,7 @@ class StopwatchAdapter (private val listener: StopwatchListener
                         oldItem.isStarted == newItem.isStarted
             }
 
-            //костыль от блика
+            //костыль от бликов при нажатии
             override fun getChangePayload(oldItem: Stopwatch, newItem: Stopwatch) = Any()
         }
     }

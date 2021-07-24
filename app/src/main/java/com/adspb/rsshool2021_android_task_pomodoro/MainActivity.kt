@@ -27,15 +27,13 @@ class MainActivity : AppCompatActivity(), StopwatchListener, LifecycleObserver {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         //Обсервер, для фиксации жизненнаго цикла приложения.
-        // в завивимости от состояния приложенич OnLifecycleEvent
+        // в завивимости от состояния приложения @OnLifecycleEvent запучкаем fun
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         lifecycleScope.launch(Dispatchers.Main) {
-            while (true) {
-                delay(10L)
-            }
+            while (true) {delay(10L)}
         }
 
         binding.recycler.apply {
@@ -56,9 +54,9 @@ class MainActivity : AppCompatActivity(), StopwatchListener, LifecycleObserver {
 
     }
 
-
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onAppBackgrounded() {
+        //check for running timers
         stopwatches.forEach() {
             if (it.isStarted) {
                 val startIntent = Intent(this, ForegroundService::class.java)
@@ -77,6 +75,7 @@ class MainActivity : AppCompatActivity(), StopwatchListener, LifecycleObserver {
     }
 
     override fun checkTimer(currentMs: Long) {
+        //сетаем в переменную значение работающего таймера, для передачив в ForegroundService
         startTime = currentMs
     }
 
@@ -88,11 +87,9 @@ class MainActivity : AppCompatActivity(), StopwatchListener, LifecycleObserver {
         changeStopwatch(id, currentMs, false)
     }
 
-
     override fun finish() {
         Toast.makeText(this,"Pomodoro time is over. Get some rest.", Toast.LENGTH_SHORT).show()
     }
-
 
     override fun delete(id: Int) {
         stopwatches.remove(stopwatches.find { it.id == id })
@@ -119,6 +116,4 @@ class MainActivity : AppCompatActivity(), StopwatchListener, LifecycleObserver {
         startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         startActivity(startMain)
     }
-
-
 }

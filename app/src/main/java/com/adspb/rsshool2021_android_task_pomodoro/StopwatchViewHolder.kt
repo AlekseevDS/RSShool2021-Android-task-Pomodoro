@@ -67,15 +67,6 @@ class StopwatchViewHolder (item: View, private val listener: StopwatchListener):
     }
 
     private fun progressCyrcle(stopwatch: Stopwatch) {
-        /*Handler(Looper.getMainLooper()).apply {
-            var current = stopwatch.currentMs
-            while (stopwatch.isStarted && current > 0) {
-            postDelayed({
-                current -= UNIT_ONE_HUNDRED_MS
-                binding.customViewTwo.setCurrent(current)}, 1000)}}*/
-
-
-//TODO переписать?
         GlobalScope.launch {
             var current = stopwatch.currentMs
             while (current > 0 && statusCustomCircleView) {
@@ -100,8 +91,6 @@ class StopwatchViewHolder (item: View, private val listener: StopwatchListener):
         (binding.blinkingIndicator.background as? AnimationDrawable)?.start()
         statusCustomCircleView = true
         progressCyrcle(stopwatch)
-
-
     }
 
     private fun stopTimer(stopwatch: Stopwatch) {
@@ -134,17 +123,14 @@ class StopwatchViewHolder (item: View, private val listener: StopwatchListener):
                 binding.deleteButton.setBackgroundColor(Color.RED)
                 binding.customViewTwo.setCurrent(0)
 
-                //Индикация 00.00.00 миганием и вызовом тоста. выполняется в другом потоке со сдвижкой
+                //Индикация 00.00.00 миганием и вызовом тоста.
                 Handler(Looper.getMainLooper()).apply {
                 postDelayed({binding.root.setCardBackgroundColor(Color.WHITE)
                     binding.deleteButton.setBackgroundColor(Color.WHITE)}, 1000)
                 postDelayed({binding.root.setCardBackgroundColor(Color.RED)
-                    binding.deleteButton.setBackgroundColor(Color.RED)}, 2000)
-                postDelayed({binding.stopwatchTimer.text = stopwatch.currentMs.displayTime()
-                    stopTimer(stopwatch)
-                    //binding.root.setCardBackgroundColor(Color.WHITE)
-                    //binding.deleteButton.setBackgroundColor(Color.WHITE)
-                            }, 3000)
+                    binding.deleteButton.setBackgroundColor(Color.RED)
+                    binding.stopwatchTimer.text = stopwatch.currentMs.displayTime()
+                    stopTimer(stopwatch)}, 2000)
                 }
             }
         }

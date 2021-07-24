@@ -9,7 +9,7 @@ const val STARTED_TIMER_TIME_MS = "STARTED_TIMER_TIME"
 
 fun Long.displayTime(): String {
     if (this <= 0L) {
-        return START_TIME //TODO TAI
+        return START_TIME
     }
     val h = this / 1000 / 3600
     val m = this / 1000 % 3600 / 60

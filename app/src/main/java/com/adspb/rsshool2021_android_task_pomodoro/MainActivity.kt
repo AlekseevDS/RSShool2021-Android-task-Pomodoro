@@ -26,12 +26,17 @@ class MainActivity : AppCompatActivity(), StopwatchListener, LifecycleObserver {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        //Обсервер, для фиксации жизненнаго цикла приложения. Ниже методы которые будут вызываться
+        //Обсервер, для фиксации жизненнаго цикла приложения.
         // в завивимости от состояния приложенич OnLifecycleEvent
-        //ProcessLifecycleOwner.get().lifecycle.addObserver(this)
-
+        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        lifecycleScope.launch(Dispatchers.Main) {
+            while (true) {
+                delay(10L)
+            }
+        }
 
         binding.recycler.apply {
             layoutManager = LinearLayoutManager(context)
@@ -48,24 +53,20 @@ class MainActivity : AppCompatActivity(), StopwatchListener, LifecycleObserver {
 
             } else {Toast.makeText(this,"Please, input the number of minutes",Toast.LENGTH_SHORT).show()}
         }
-        startTime = System.currentTimeMillis()
-        /*lifecycleScope.launch(Dispatchers.Main) {
-                startTime = 1L
-            delay(1000L)
-
-        }*/
-
-
 
     }
 
 
     @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     fun onAppBackgrounded() {
-        val startIntent = Intent(this, ForegroundService::class.java)
-        startIntent.putExtra(COMMAND_ID, COMMAND_START)
-        startIntent.putExtra(STARTED_TIMER_TIME_MS, startTime)
-        startService(startIntent)
+        stopwatches.forEach() {
+            if (it.isStarted) {
+                val startIntent = Intent(this, ForegroundService::class.java)
+                startIntent.putExtra(COMMAND_ID, COMMAND_START)
+                startIntent.putExtra(STARTED_TIMER_TIME_MS, startTime)
+                startService(startIntent)
+            }
+        }
     }
 
     @OnLifecycleEvent(Lifecycle.Event.ON_START)
@@ -73,6 +74,10 @@ class MainActivity : AppCompatActivity(), StopwatchListener, LifecycleObserver {
         val stopIntent = Intent(this, ForegroundService::class.java)
         stopIntent.putExtra(COMMAND_ID, COMMAND_STOP)
         startService(stopIntent)
+    }
+
+    override fun checkTimer(currentMs: Long) {
+        startTime = currentMs
     }
 
     override fun start(id: Int) {
@@ -108,15 +113,12 @@ class MainActivity : AppCompatActivity(), StopwatchListener, LifecycleObserver {
         stopwatches.addAll(newTimers)
     }
 
-    private companion object {
-
-        private const val START_TIME = "00:00:00"
-        private const val UNIT_ONE_HUNDRED_MS = 100L
-        const val INVALID = "INVALID"
-        const val COMMAND_START = "COMMAND_START"
-        const val COMMAND_STOP = "COMMAND_STOP"
-        const val COMMAND_ID = "COMMAND_ID"
-        const val STARTED_TIMER_TIME_MS = "STARTED_TIMER_TIME"
+    override fun onBackPressed() {
+        val startMain = Intent(Intent.ACTION_MAIN)
+        startMain.addCategory(Intent.CATEGORY_HOME)
+        startMain.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        startActivity(startMain)
     }
+
 
 }

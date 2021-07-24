@@ -32,6 +32,12 @@ class StopwatchViewHolder (item: View, private val listener: StopwatchListener):
     fun bind(stopwatch: Stopwatch) {
 
         binding.stopwatchTimer.text = stopwatch.currentMs.displayTime()
+
+        if (stopwatch.currentMs != stopwatch.START_VALUE_MS) {
+            binding.root.setCardBackgroundColor(Color.WHITE)
+            binding.deleteButton.setBackgroundColor(Color.WHITE)
+        }
+
         binding.customViewTwo.isVisible = stopwatch.currentMs != stopwatch.START_VALUE_MS
         binding.customViewTwo.setPeriod(stopwatch.START_VALUE_MS)
 
@@ -73,9 +79,9 @@ class StopwatchViewHolder (item: View, private val listener: StopwatchListener):
         GlobalScope.launch {
             var current = stopwatch.currentMs
             while (current > 0 && statusCustomCircleView) {
-                current -= UNIT_ONE_HUNDRED_MS
+                current -= UNIT_ONE_SEC_IN_MS
                 binding.customViewTwo.setCurrent(current)
-                delay(UNIT_ONE_HUNDRED_MS)
+                delay(UNIT_ONE_SEC_IN_MS)
             }
         }
     }
@@ -83,6 +89,8 @@ class StopwatchViewHolder (item: View, private val listener: StopwatchListener):
     private fun startTimer(stopwatch: Stopwatch) {
         binding.startPauseButton.text = "STOP"
         binding.customViewTwo.isVisible = true
+        binding.root.setCardBackgroundColor(Color.WHITE)
+        binding.deleteButton.setBackgroundColor(Color.WHITE)
 
         timer?.cancel()
         timer = getCountDownTimer(stopwatch)
@@ -107,11 +115,12 @@ class StopwatchViewHolder (item: View, private val listener: StopwatchListener):
     }
 
     private fun getCountDownTimer(stopwatch: Stopwatch): CountDownTimer {
-        return object : CountDownTimer(stopwatch.currentMs, UNIT_ONE_HUNDRED_MS) {
-            val interval = UNIT_ONE_HUNDRED_MS
+        return object : CountDownTimer(stopwatch.currentMs, UNIT_ONE_SEC_IN_MS) {
+            val interval = UNIT_ONE_SEC_IN_MS
 
             override fun onTick(millisUntilFinished: Long) {
                 stopwatch.currentMs -= interval
+                listener.checkTimer(stopwatch.currentMs)
                 binding.stopwatchTimer.text = stopwatch.currentMs.displayTime()
             }
 
@@ -133,18 +142,20 @@ class StopwatchViewHolder (item: View, private val listener: StopwatchListener):
                     binding.deleteButton.setBackgroundColor(Color.RED)}, 2000)
                 postDelayed({binding.stopwatchTimer.text = stopwatch.currentMs.displayTime()
                     stopTimer(stopwatch)
-                    binding.root.setCardBackgroundColor(Color.WHITE)
-                    binding.deleteButton.setBackgroundColor(Color.WHITE)}, 3000)
+                    //binding.root.setCardBackgroundColor(Color.WHITE)
+                    //binding.deleteButton.setBackgroundColor(Color.WHITE)
+                            }, 3000)
                 }
             }
         }
     }
 
-    //блок отображения времени на таймере
+    //ПЕРЕНЕСЕН в файл Utils.kt
+ /*   //блок отображения времени на таймере
     private fun Long.displayTime(): String {
 
         if (this <= 0L) {
-            return START_TIME //TODO TAI
+            return START_TIME
         }
         val h = this / 1000 / 3600
         val m = this / 1000 % 3600 / 60
@@ -159,17 +170,12 @@ class StopwatchViewHolder (item: View, private val listener: StopwatchListener):
         } else {
             "0$count"
         }
-    }
+    }*/
 
     private companion object {
 
         private const val START_TIME = "00:00:00"
-        private const val UNIT_ONE_HUNDRED_MS = 100L
-        const val INVALID = "INVALID"
-        const val COMMAND_START = "COMMAND_START"
-        const val COMMAND_STOP = "COMMAND_STOP"
-        const val COMMAND_ID = "COMMAND_ID"
-        const val STARTED_TIMER_TIME_MS = "STARTED_TIMER_TIME"
+        private const val UNIT_ONE_SEC_IN_MS = 1000L
     }
 }
 

@@ -20,7 +20,7 @@ class ForegroundService : Service() {
 
     private val builder by lazy {
         NotificationCompat.Builder(this, CHANNEL_ID)
-            .setContentTitle("Simple Timer")
+            .setContentTitle("Pomodoro Timer")
             .setGroup("Timer")
             .setGroupSummary(false)
             .setDefaults(NotificationCompat.DEFAULT_ALL)
@@ -72,11 +72,13 @@ class ForegroundService : Service() {
 
     private fun continueTimer(startTime: Long) {
         job = GlobalScope.launch(Dispatchers.Main) {
+            var startTimeNotif = startTime
             while (true) {
+                startTimeNotif -= INTERVAL
                 notificationManager?.notify(
                     NOTIFICATION_ID,
                     getNotification(
-                        (System.currentTimeMillis() - startTime).displayTime().dropLast(3)
+                        (startTimeNotif).displayTime()
                     )
                 )
                 delay(INTERVAL)

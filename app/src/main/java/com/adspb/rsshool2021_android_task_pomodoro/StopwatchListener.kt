@@ -9,5 +9,7 @@ interface StopwatchListener {
 
     fun finish()
 
+    fun checkTimer(currentMs: Long)
+
 
 }

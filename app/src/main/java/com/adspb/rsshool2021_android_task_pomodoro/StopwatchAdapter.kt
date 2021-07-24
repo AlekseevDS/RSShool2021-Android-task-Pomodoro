@@ -26,6 +26,7 @@ class StopwatchAdapter (private val listener: StopwatchListener
     //заполняет надутый вью из листа по указанной позиции
     override fun onBindViewHolder(holder: StopwatchViewHolder, position: Int) {
 //        передаем позицию из списка
+
         holder.bind(getItem(position))
     }
 
